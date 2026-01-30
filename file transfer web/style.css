@@ -1,0 +1,94 @@
+:root {
+    --bg-color: #0f172a;
+    --sender-color: #f59e0b;
+    --receiver-color: #10b981;
+    --text-main: #f8fafc;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background-color: var(--bg-color);
+    font-family: 'Hind Siliguri', 'Segoe UI', sans-serif;
+    color: var(--text-main);
+    overflow-x: hidden;
+}
+
+.glass-bg {
+    position: fixed;
+    top: -10%; left: -10%;
+    width: 120%; height: 120%;
+    background: radial-gradient(circle, rgba(52,152,219,0.15) 0%, rgba(15,23,42,1) 70%);
+    z-index: -1;
+}
+
+.container { padding: 30px 20px; max-width: 900px; margin: 0 auto; }
+
+header { text-align: center; margin-bottom: 40px; }
+
+.logo-box h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 5px; }
+
+.status-tag {
+    background: #ef4444; color: white;
+    font-size: 12px; padding: 4px 12px;
+    border-radius: 50px; text-transform: uppercase; font-weight: bold;
+}
+
+.subtitle { opacity: 0.8; margin-top: 15px; font-size: 18px; }
+
+/* Action Cards */
+.action-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px rgba(255,255,255,0.1) solid;
+    padding: 30px; border-radius: 24px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    transition: transform 0.3s ease;
+}
+
+.glass-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
+
+.card-header { margin-bottom: 15px; }
+
+.icon-circle {
+    font-size: 40px; background: rgba(255,255,255,0.05);
+    width: 70px; height: 70px; display: flex;
+    align-items: center; justify-content: center;
+    border-radius: 20px; margin-bottom: 15px;
+}
+
+.glass-card h2 { font-size: 22px; margin-bottom: 10px; }
+.glass-card p { font-size: 15px; opacity: 0.7; line-height: 1.5; }
+
+.btn {
+    display: block; text-align: center; padding: 15px;
+    border-radius: 12px; text-decoration: none;
+    color: white; font-weight: bold; margin-top: 25px; transition: 0.2s;
+}
+
+.sender .btn { background: var(--sender-color); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+.receiver .btn { background: var(--receiver-color); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+
+/* How to section */
+.how-to {
+    background: rgba(255,255,255,0.03); padding: 30px; border-radius: 24px;
+}
+
+.step-item { display: flex; align-items: flex-start; margin-bottom: 20px; }
+
+.step-num {
+    background: rgba(255,255,255,0.1); width: 30px; height: 30px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    margin-right: 15px; flex-shrink: 0; font-weight: bold;
+}
+
+/* Mobile Responsive */
+@media (max-width: 650px) {
+    .action-grid { grid-template-columns: 1fr; }
+    .logo-box h1 { font-size: 2.2rem; }
+    .glass-card { padding: 25px; }
+}

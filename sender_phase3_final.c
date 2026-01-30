@@ -21,8 +21,9 @@ Receiver rcvs[MAX_RCV];
 int rcv_count = 0;
 int selected = -1;
 
-HWND hList, hProg;
+HWND hList, hProg, hBtn;
 
+/* ---------- helpers ---------- */
 int send_all(SOCKET s, const char *buf, int len){
     int sent = 0;
     while(sent < len){
@@ -33,6 +34,7 @@ int send_all(SOCKET s, const char *buf, int len){
     return sent;
 }
 
+/* ---------- discovery ---------- */
 void discover_receivers(){
     WSADATA w;
     WSAStartup(MAKEWORD(2,2), &w);
@@ -79,16 +81,28 @@ void discover_receivers(){
     closesocket(s);
 }
 
+/* ---------- send thread ---------- */
 DWORD WINAPI send_file(LPVOID){
+    EnableWindow(hBtn, FALSE);   // 🔥 prevent double click
+
     char path[MAX_PATH] = {0};
     OPENFILENAME ofn = {sizeof(ofn)};
     ofn.lpstrFile = path;
     ofn.nMaxFile = MAX_PATH;
     ofn.lpstrFilter = "All Files\0*.*\0";
 
-    if(!GetOpenFileName(&ofn)) return 0;
+    if(!GetOpenFileName(&ofn)){
+        EnableWindow(hBtn, TRUE);
+        return 0;
+    }
 
     FILE *f = fopen(path,"rb");
+    if(!f){
+        MessageBox(0,"File open failed","Sender",MB_OK);
+        EnableWindow(hBtn, TRUE);
+        return 0;
+    }
+
     _fseeki64(f,0,SEEK_END);
     long long size = _ftelli64(f);
     _fseeki64(f,0,SEEK_SET);
@@ -103,7 +117,13 @@ DWORD WINAPI send_file(LPVOID){
     a.sin_port = htons(TCP_PORT);
     a.sin_addr.s_addr = inet_addr(rcvs[selected].ip);
 
-    connect(s,(SOCKADDR*)&a,sizeof(a));
+    if(connect(s,(SOCKADDR*)&a,sizeof(a)) != 0){
+        MessageBox(0,"Connect failed","Sender",MB_OK);
+        fclose(f);
+        closesocket(s);
+        EnableWindow(hBtn, TRUE);
+        return 0;
+    }
 
     send_all(s,(char*)&flen,sizeof(int));
     send_all(s,fname,flen);
@@ -115,18 +135,29 @@ DWORD WINAPI send_file(LPVOID){
     while(!feof(f)){
         int n = fread(buf,1,BUF,f);
         if(n <= 0) break;
-        send_all(s,buf,n);
+        if(send_all(s,buf,n) < 0) break;
         sent += n;
+
         int p = (int)((sent * 100LL) / size);
         SendMessage(hProg, PBM_SETPOS, p, 0);
     }
 
     fclose(f);
+
+    shutdown(s, SD_SEND);
+    Sleep(50);
     closesocket(s);
+
+    /* 🔥 RESET UI STATE */
+    selected = -1;
+    SendMessage(hList, LB_SETCURSEL, (WPARAM)-1, 0);
+    EnableWindow(hBtn, TRUE);
+
     MessageBox(0,"Transfer complete","Sender",MB_OK);
     return 0;
 }
 
+/* ---------- window ---------- */
 LRESULT CALLBACK WndProc(HWND h, UINT m, WPARAM w, LPARAM l){
     if(m == WM_CREATE){
         hList = CreateWindow("LISTBOX","",
@@ -136,13 +167,11 @@ LRESULT CALLBACK WndProc(HWND h, UINT m, WPARAM w, LPARAM l){
 
         for(int i=0;i<rcv_count;i++){
             char line[128];
-            sprintf(line,"%s (%s)",
-                    rcvs[i].name,
-                    rcvs[i].ip);
+            sprintf(line,"%s (%s)", rcvs[i].name, rcvs[i].ip);
             SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)line);
         }
 
-        CreateWindow("BUTTON","Send File",
+        hBtn = CreateWindow("BUTTON","Send File",
             WS_CHILD|WS_VISIBLE,
             130,150,120,30,
             h,(HMENU)2,0,0);
@@ -151,19 +180,22 @@ LRESULT CALLBACK WndProc(HWND h, UINT m, WPARAM w, LPARAM l){
             WS_CHILD|WS_VISIBLE,
             20,190,340,20,
             h,0,0,0);
+
         SendMessage(hProg, PBM_SETRANGE, 0, MAKELPARAM(0,100));
     }
 
     if(m == WM_COMMAND && LOWORD(w) == 2){
         selected = SendMessage(hList, LB_GETCURSEL, 0, 0);
-        if(selected != LB_ERR)
+        if(selected != LB_ERR){
             CreateThread(0,0,send_file,0,0,0);
+        }
     }
 
     if(m == WM_DESTROY) PostQuitMessage(0);
     return DefWindowProc(h,m,w,l);
 }
 
+/* ---------- entry ---------- */
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE,LPSTR,int){
     INITCOMMONCONTROLSEX ic={sizeof(ic),ICC_PROGRESS_CLASS};
     InitCommonControlsEx(&ic);
