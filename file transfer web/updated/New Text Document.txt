@@ -40,18 +40,35 @@
 
         <section class="how-to">
             <h3>কিভাবে শুরু করবেন?</h3>
-            <div class="steps">
-                <div class="step-item">
-                    <div class="step-num">১</div>
-                    <p>উভয় পিসি একই WiFi বা LAN-এ যুক্ত করুন।</p>
+            <div class="steps-container">
+                <div class="step-card">
+                    <div class="step-info">
+                        <div class="step-num">১</div>
+                        <p>উভয় পিসি একই WiFi বা LAN-এ যুক্ত করুন।</p>
+                    </div>
+                    <div class="step-image-box">
+                        <img src="আপনার_প্রথম_ইমেজ_লিঙ্ক" alt="Connect to WiFi" class="step-img">
+                    </div>
                 </div>
-                <div class="step-item">
-                    <div class="step-num">২</div>
-                    <p>অ্যাপ দুটি ওপেন করে <strong>Receiver</strong> পিসিতে সেভ করার ফোল্ডারটি বেছে নিন।</p>
+
+                <div class="step-card">
+                    <div class="step-info">
+                        <div class="step-num">২</div>
+                        <p>অ্যাপ দুটি ওপেন করে <strong>Receiver</strong> পিসিতে সেভ করার ফোল্ডারটি বেছে নিন।</p>
+                    </div>
+                    <div class="step-image-box">
+                        <img src="আপনার_দ্বিতীয়_ইমেজ_লিঙ্ক" alt="Select Folder" class="step-img">
+                    </div>
                 </div>
-                <div class="step-item">
-                    <div class="step-num">৩</div>
-                    <p><strong>Sender</strong> অ্যাপ থেকে রিসিভার আইপি সিলেক্ট করে ফাইল পাঠান।</p>
+
+                <div class="step-card">
+                    <div class="step-info">
+                        <div class="step-num">৩</div>
+                        <p><strong>Sender</strong> অ্যাপ থেকে রিসিভার আইপি সিলেক্ট করে ফাইল পাঠান।</p>
+                    </div>
+                    <div class="step-image-box">
+                        <img src="আপনার_তৃতীয়_ইমেজ_লিঙ্ক" alt="Send File" class="step-img">
+                    </div>
                 </div>
             </div>
         </section>
